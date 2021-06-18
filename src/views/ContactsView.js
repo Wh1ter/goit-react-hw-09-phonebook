@@ -17,7 +17,7 @@ function ContactsView({
 }) {
   useEffect(() => {
     fetchContacts();
-  }, []);
+  }, [fetchContacts]);
   return (
     <div className="contacts">
       <h1>Phonebook</h1>

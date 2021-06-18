@@ -14,6 +14,7 @@ const ContactsView = lazy(() => import("./views/ContactsView"));
 function App({ onGetCurrentUser }) {
   useEffect(() => {
     onGetCurrentUser();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
