@@ -1,25 +1,44 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, Suspense, lazy } from "react";
+import { Route, Switch } from "react-router-dom";
+import { connect } from "react-redux";
+import AppBar from "./components/AppBar";
+import authOperations from "./redux/auth/auth-operations";
+import PrivateRoute from "./components/PrivateRoute";
+import PublicRoute from "./components/PublicRoute";
 
-function App() {
+const HomeView = lazy(() => import("./views/HomeView"));
+const LoginView = lazy(() => import("./views/LoginView"));
+const RegisterView = lazy(() => import("./views/RegisterView"));
+const ContactsView = lazy(() => import("./views/ContactsView"));
+
+function App({ onGetCurrentUser }) {
+  useEffect(() => {
+    onGetCurrentUser();
+  }, []);
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <AppBar />
+      <Suspense fallback={<p>Loading...</p>}>
+        <Switch>
+          <Route exact path="/" component={HomeView} />
+          <PublicRoute path="/register" redirectTo="/contacts" restricted>
+            <Route path="/register" component={RegisterView} />
+          </PublicRoute>
+          <PublicRoute path="/login" redirectTo="/contacts" restricted>
+            <Route path="/login" component={LoginView} />
+          </PublicRoute>
+          <PrivateRoute path="/contacts" redirectTo="/login">
+            <Route path="/contacts" component={ContactsView} />
+          </PrivateRoute>
+        </Switch>
+      </Suspense>
     </div>
   );
 }
 
-export default App;
+const mapDispatchToProrps = {
+  onGetCurrentUser: authOperations.getCurrentUser,
+};
+
+export default connect(null, mapDispatchToProrps)(App);
